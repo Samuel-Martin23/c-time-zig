@@ -2,7 +2,7 @@ const std: type = @import("std");
 
 const c_time: type = @import("c_time");
 
-pub fn main() !void {
+pub fn main() void {
     var buffer: [64]u8 = undefined;
     const dateTime: c_time.DateTime = c_time.DateTime{
         .year = 124,
@@ -13,5 +13,6 @@ pub fn main() !void {
         .sec = 0,
     };
 
-    std.debug.print("{s}", .{try c_time.ascTimeTS(&buffer, dateTime)});
+    const s: []u8 = c_time.ascTimeTS(&buffer, dateTime) orelse return;
+    std.debug.print("{s}", .{s});
 }

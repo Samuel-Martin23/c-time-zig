@@ -2,7 +2,7 @@ const std: type = @import("std");
 
 const c_time: type = @import("c_time");
 
-pub fn main() !void {
+pub fn main() void {
     var dateTime: c_time.DateTime = c_time.DateTime{
         .year = 124,
         .mon = 0,

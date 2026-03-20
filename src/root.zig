@@ -15,12 +15,18 @@ pub const DateTime: type = struct {
     isdst: i32 = 0,
 };
 
-pub fn ascTime(datetime: DateTime) []const u8 {
+pub fn ascTime(datetime: DateTime) ?[]u8 {
     const tm: c.struct_tm = tmFromDateTime(&datetime);
-    return std.mem.span(c.asctime(&tm));
+    const s: [*c]u8 = c.asctime(&tm);
+
+    if (s == null) {
+        return null;
+    }
+
+    return std.mem.span(s);
 }
 
-pub fn ascTimeTS(buf: []u8, datetime: DateTime) ![]u8 {
+pub fn ascTimeTS(buf: []u8, datetime: DateTime) ?[]u8 {
     return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
@@ -28,13 +34,19 @@ pub fn clock() i32 {
     return @intCast(c.clock());
 }
 
-pub fn cTime(t: i64) []const u8 {
+pub fn cTime(t: i64) ?[]u8 {
     const casted_t: c.time_t = @intCast(t);
-    return std.mem.span(c.ctime(&casted_t));
+    const s: [*c]u8 = c.ctime(&casted_t);
+
+    if (s == null) {
+        return null;
+    }
+
+    return std.mem.span(s);
 }
 
-pub fn cTimeTS(buf: []u8, t: i64) ![]u8 {
-    const datetime: DateTime = try localTimeTS(t);
+pub fn cTimeTS(buf: []u8, t: i64) ?[]u8 {
+    const datetime: DateTime = localTimeTS(t) orelse return null;
     return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
@@ -42,21 +54,25 @@ pub fn diffTime(t1: i64, t2: i64) f64 {
     return c.difftime(@intCast(t1), @intCast(t2));
 }
 
-pub fn gmTime(t: i64) DateTime {
+pub fn gmTime(t: i64) ?DateTime {
     const casted_t: c.time_t = @intCast(t);
     const tm: [*c]c.struct_tm = c.gmtime(&casted_t);
+
+    if (tm == null) {
+        return null;
+    }
 
     return dateTimeFromTm(@ptrCast(tm));
 }
 
-pub fn gmTimeTS(t: i64) !DateTime {
+pub fn gmTimeTS(t: i64) ?DateTime {
     var tm: c.struct_tm = c.struct_tm{};
 
     if (@hasDecl(c, "_gmtime64_s")) {
         const casted_t: c.__time64_t = @intCast(t);
 
         if (c._gmtime64_s(&tm, &casted_t) != 0) {
-            return error.TimeConversionFailed;
+            return null;
         }
 
         return dateTimeFromTm(&tm);
@@ -65,27 +81,31 @@ pub fn gmTimeTS(t: i64) !DateTime {
     const casted_t: c.time_t = @intCast(t);
 
     if (c.gmtime_r(&casted_t, &tm) == null) {
-        return error.TimeConversionFailed;
+        return null;
     }
 
     return dateTimeFromTm(&tm);
 }
 
-pub fn localTime(t: i64) DateTime {
+pub fn localTime(t: i64) ?DateTime {
     const casted_t: c.time_t = @intCast(t);
     const tm: [*c]c.struct_tm = c.localtime(&casted_t);
+
+    if (tm == null) {
+        return null;
+    }
 
     return dateTimeFromTm(@ptrCast(tm));
 }
 
-pub fn localTimeTS(t: i64) !DateTime {
+pub fn localTimeTS(t: i64) ?DateTime {
     var tm: c.struct_tm = c.struct_tm{};
 
     if (@hasDecl(c, "_localtime64_s")) {
         const casted_t: c.__time64_t = @intCast(t);
 
         if (c._localtime64_s(&tm, &casted_t) != 0) {
-            return error.InvalidTime;
+            return null;
         }
 
         return dateTimeFromTm(&tm);
@@ -94,7 +114,7 @@ pub fn localTimeTS(t: i64) !DateTime {
     const casted_t: c.time_t = @intCast(t);
 
     if (c.localtime_r(&casted_t, &tm) == null) {
-        return error.InvalidTime;
+        return null;
     }
 
     return dateTimeFromTm(&tm);
@@ -109,12 +129,12 @@ pub fn mkTime(datetime: *DateTime) i64 {
     return return_value;
 }
 
-pub fn strFormatTime(buf: []u8, format: []const u8, datetime: DateTime) ![]u8 {
+pub fn strFormatTime(buf: []u8, format: []const u8, datetime: DateTime) ?[]u8 {
     const tm: c.struct_tm = tmFromDateTime(&datetime);
     const bytes_written: usize = c.strftime(buf.ptr, buf.len, format.ptr, &tm);
 
     if (bytes_written == 0) {
-        return error.BufferTooSmall;
+        return null;
     }
 
     return buf[0..bytes_written];

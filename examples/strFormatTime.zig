@@ -4,7 +4,6 @@ const c_time: type = @import("c_time");
 
 pub fn main() !void {
     var buffer: [64]u8 = undefined;
-
     const dateTime: c_time.DateTime = c_time.DateTime{
         .year = 124,
         .mon = 0,
@@ -14,7 +13,5 @@ pub fn main() !void {
         .sec = 0,
     };
 
-    const s: []u8 = try c_time.strFormatTime("%Y-%m-%d %H:%M", dateTime, &buffer);
-
-    std.debug.print("{s}\n", .{s});
+    std.debug.print("{s}\n", .{try c_time.strFormatTime(&buffer, "%Y-%m-%d %H:%M", dateTime)});
 }

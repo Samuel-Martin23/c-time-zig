@@ -21,10 +21,10 @@ pub fn ascTime(datetime: DateTime) []const u8 {
     return std.mem.span(c.asctime(&tm));
 }
 
-pub fn ascTimeTS(datetime: DateTime, buf: []u8) ![]u8 {
+pub fn ascTimeTS(buf: []u8, datetime: DateTime) ![]u8 {
     const fmt = "%a %b %e %H:%M:%S %Y\n";
 
-    return strFormatTime(fmt, datetime, buf);
+    return strFormatTime(buf, fmt, datetime);
 }
 
 pub fn clock() i32 {
@@ -37,11 +37,11 @@ pub fn cTime(t: i64) []const u8 {
     return std.mem.span(c.ctime(&casted_t));
 }
 
-pub fn cTimeTS(t: i64, buf: []u8) ![]u8 {
+pub fn cTimeTS(buf: []u8, t: i64) ![]u8 {
     const fmt = "%a %b %e %H:%M:%S %Y\n";
     const datetime: DateTime = try localTimeTS(t);
 
-    return strFormatTime(fmt, datetime, buf);
+    return strFormatTime(buf, fmt, datetime);
 }
 
 pub fn diffTime(t1: i64, t2: i64) f64 {
@@ -115,7 +115,7 @@ pub fn mkTime(datetime: *DateTime) i64 {
     return return_value;
 }
 
-pub fn strFormatTime(format: []const u8, datetime: DateTime, buf: []u8) ![]u8 {
+pub fn strFormatTime(buf: []u8, format: []const u8, datetime: DateTime) ![]u8 {
     const tm: c.struct_tm = dateTimeToTm(&datetime);
     const bytes_written: usize = c.strftime(buf.ptr, buf.len, format.ptr, &tm);
 

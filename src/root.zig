@@ -15,8 +15,8 @@ pub const DateTime: type = struct {
     isdst: i32 = 0,
 };
 
-pub fn ascTime(datetime: DateTime) ?[]u8 {
-    const tm: c.struct_tm = tmFromDateTime(&datetime);
+pub fn ascTime(date_time: DateTime) ?[]u8 {
+    const tm: c.struct_tm = tmFromDateTime(&date_time);
     const s: [*c]u8 = c.asctime(&tm);
 
     if (s == null) {
@@ -26,8 +26,8 @@ pub fn ascTime(datetime: DateTime) ?[]u8 {
     return std.mem.span(s);
 }
 
-pub fn ascTimeTS(buf: []u8, datetime: DateTime) ?[]u8 {
-    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
+pub fn ascTimeTS(buf: []u8, date_time: DateTime) ?[]u8 {
+    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
 pub fn clock() i32 {
@@ -46,8 +46,8 @@ pub fn cTime(t: i64) ?[]u8 {
 }
 
 pub fn cTimeTS(buf: []u8, t: i64) ?[]u8 {
-    const datetime: DateTime = localTimeTS(t) orelse return null;
-    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
+    const date_time: DateTime = localTimeTS(t) orelse return null;
+    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
 pub fn diffTime(t1: i64, t2: i64) f64 {
@@ -120,17 +120,17 @@ pub fn localTimeTS(t: i64) ?DateTime {
     return dateTimeFromTm(&tm);
 }
 
-pub fn mkTime(datetime: *DateTime) i64 {
-    var tm: c.struct_tm = tmFromDateTime(datetime);
+pub fn mkTime(date_time: *DateTime) i64 {
+    var tm: c.struct_tm = tmFromDateTime(date_time);
     const return_value: i64 = @intCast(c.mktime(&tm));
 
-    datetime.* = dateTimeFromTm(&tm);
+    date_time.* = dateTimeFromTm(&tm);
 
     return return_value;
 }
 
-pub fn strFmtTime(buf: []u8, format: []const u8, datetime: DateTime) ?[]u8 {
-    const tm: c.struct_tm = tmFromDateTime(&datetime);
+pub fn strFmtTime(buf: []u8, format: []const u8, date_time: DateTime) ?[]u8 {
+    const tm: c.struct_tm = tmFromDateTime(&date_time);
     const bytes_written: usize = c.strftime(buf.ptr, buf.len, format.ptr, &tm);
 
     if (bytes_written == 0) {
@@ -158,16 +158,16 @@ fn dateTimeFromTm(tm: *const c.struct_tm) DateTime {
     };
 }
 
-fn tmFromDateTime(datetime: *const DateTime) c.struct_tm {
+fn tmFromDateTime(date_time: *const DateTime) c.struct_tm {
     return c.struct_tm{
-        .tm_sec = @intCast(datetime.sec),
-        .tm_min = @intCast(datetime.min),
-        .tm_hour = @intCast(datetime.hour),
-        .tm_mday = @intCast(datetime.mday),
-        .tm_mon = @intCast(datetime.mon),
-        .tm_year = @intCast(datetime.year),
-        .tm_wday = @intCast(datetime.wday),
-        .tm_yday = @intCast(datetime.yday),
-        .tm_isdst = @intCast(datetime.isdst),
+        .tm_sec = @intCast(date_time.sec),
+        .tm_min = @intCast(date_time.min),
+        .tm_hour = @intCast(date_time.hour),
+        .tm_mday = @intCast(date_time.mday),
+        .tm_mon = @intCast(date_time.mon),
+        .tm_year = @intCast(date_time.year),
+        .tm_wday = @intCast(date_time.wday),
+        .tm_yday = @intCast(date_time.yday),
+        .tm_isdst = @intCast(date_time.isdst),
     };
 }

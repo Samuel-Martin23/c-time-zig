@@ -27,7 +27,7 @@ pub fn ascTime(datetime: DateTime) ?[]u8 {
 }
 
 pub fn ascTimeTS(buf: []u8, datetime: DateTime) ?[]u8 {
-    return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
+    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
 pub fn clock() i32 {
@@ -47,7 +47,7 @@ pub fn cTime(t: i64) ?[]u8 {
 
 pub fn cTimeTS(buf: []u8, t: i64) ?[]u8 {
     const datetime: DateTime = localTimeTS(t) orelse return null;
-    return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
+    return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
 pub fn diffTime(t1: i64, t2: i64) f64 {
@@ -129,7 +129,7 @@ pub fn mkTime(datetime: *DateTime) i64 {
     return return_value;
 }
 
-pub fn strFormatTime(buf: []u8, format: []const u8, datetime: DateTime) ?[]u8 {
+pub fn strFmtTime(buf: []u8, format: []const u8, datetime: DateTime) ?[]u8 {
     const tm: c.struct_tm = tmFromDateTime(&datetime);
     const bytes_written: usize = c.strftime(buf.ptr, buf.len, format.ptr, &tm);
 

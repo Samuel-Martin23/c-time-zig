@@ -13,6 +13,6 @@ pub fn main() void {
         .sec = 0,
     };
 
-    const s: []const u8 = c_time.strFormatTime(&buffer, "%Y-%m-%d %H:%M", date_time) orelse return;
+    const s: []const u8 = c_time.strFmtTime(&buffer, "%Y-%m-%d %H:%M", date_time) orelse return;
     std.debug.print("{s}\n", .{s});
 }

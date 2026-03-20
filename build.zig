@@ -89,8 +89,8 @@ pub fn build(b: *std.Build) void {
             .desc = "Converts a local broken-down time structure into calendar time",
         },
         .{
-            .name = "strFormatTime",
-            .path = "examples/strFormatTime.zig",
+            .name = "strFmtTime",
+            .path = "examples/strFmtTime.zig",
             .desc = "Formats a broken-down time using custom strftime-style format specifiers",
         },
         .{

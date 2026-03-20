@@ -16,15 +16,12 @@ pub const DateTime: type = struct {
 };
 
 pub fn ascTime(datetime: DateTime) []const u8 {
-    const tm: c.struct_tm = dateTimeToTm(&datetime);
-
+    const tm: c.struct_tm = tmFromDateTime(&datetime);
     return std.mem.span(c.asctime(&tm));
 }
 
 pub fn ascTimeTS(buf: []u8, datetime: DateTime) ![]u8 {
-    const fmt = "%a %b %e %H:%M:%S %Y\n";
-
-    return strFormatTime(buf, fmt, datetime);
+    return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
 pub fn clock() i32 {
@@ -33,15 +30,12 @@ pub fn clock() i32 {
 
 pub fn cTime(t: i64) []const u8 {
     const casted_t: c.time_t = @intCast(t);
-
     return std.mem.span(c.ctime(&casted_t));
 }
 
 pub fn cTimeTS(buf: []u8, t: i64) ![]u8 {
-    const fmt = "%a %b %e %H:%M:%S %Y\n";
     const datetime: DateTime = try localTimeTS(t);
-
-    return strFormatTime(buf, fmt, datetime);
+    return strFormatTime(buf, "%a %b %e %H:%M:%S %Y\n", datetime);
 }
 
 pub fn diffTime(t1: i64, t2: i64) f64 {
@@ -52,7 +46,7 @@ pub fn gmTime(t: i64) DateTime {
     const casted_t: c.time_t = @intCast(t);
     const tm: [*c]c.struct_tm = c.gmtime(&casted_t);
 
-    return tmToDateTime(@ptrCast(tm));
+    return dateTimeFromTm(@ptrCast(tm));
 }
 
 pub fn gmTimeTS(t: i64) !DateTime {
@@ -65,7 +59,7 @@ pub fn gmTimeTS(t: i64) !DateTime {
             return error.TimeConversionFailed;
         }
 
-        return tmToDateTime(&tm);
+        return dateTimeFromTm(&tm);
     }
 
     const casted_t: c.time_t = @intCast(t);
@@ -74,14 +68,14 @@ pub fn gmTimeTS(t: i64) !DateTime {
         return error.TimeConversionFailed;
     }
 
-    return tmToDateTime(&tm);
+    return dateTimeFromTm(&tm);
 }
 
 pub fn localTime(t: i64) DateTime {
     const casted_t: c.time_t = @intCast(t);
     const tm: [*c]c.struct_tm = c.localtime(&casted_t);
 
-    return tmToDateTime(@ptrCast(tm));
+    return dateTimeFromTm(@ptrCast(tm));
 }
 
 pub fn localTimeTS(t: i64) !DateTime {
@@ -94,7 +88,7 @@ pub fn localTimeTS(t: i64) !DateTime {
             return error.InvalidTime;
         }
 
-        return tmToDateTime(&tm);
+        return dateTimeFromTm(&tm);
     }
 
     const casted_t: c.time_t = @intCast(t);
@@ -103,20 +97,20 @@ pub fn localTimeTS(t: i64) !DateTime {
         return error.InvalidTime;
     }
 
-    return tmToDateTime(&tm);
+    return dateTimeFromTm(&tm);
 }
 
 pub fn mkTime(datetime: *DateTime) i64 {
-    var tm: c.struct_tm = dateTimeToTm(datetime);
+    var tm: c.struct_tm = tmFromDateTime(datetime);
     const return_value: i64 = @intCast(c.mktime(&tm));
 
-    datetime.* = tmToDateTime(&tm);
+    datetime.* = dateTimeFromTm(&tm);
 
     return return_value;
 }
 
 pub fn strFormatTime(buf: []u8, format: []const u8, datetime: DateTime) ![]u8 {
-    const tm: c.struct_tm = dateTimeToTm(&datetime);
+    const tm: c.struct_tm = tmFromDateTime(&datetime);
     const bytes_written: usize = c.strftime(buf.ptr, buf.len, format.ptr, &tm);
 
     if (bytes_written == 0) {
@@ -130,7 +124,7 @@ pub fn time() i64 {
     return @intCast(c.time(null));
 }
 
-fn tmToDateTime(tm: *const c.struct_tm) DateTime {
+fn dateTimeFromTm(tm: *const c.struct_tm) DateTime {
     return DateTime{
         .sec = @intCast(tm.tm_sec),
         .min = @intCast(tm.tm_min),
@@ -144,7 +138,7 @@ fn tmToDateTime(tm: *const c.struct_tm) DateTime {
     };
 }
 
-fn dateTimeToTm(datetime: *const DateTime) c.struct_tm {
+fn tmFromDateTime(datetime: *const DateTime) c.struct_tm {
     return c.struct_tm{
         .tm_sec = @intCast(datetime.sec),
         .tm_min = @intCast(datetime.min),

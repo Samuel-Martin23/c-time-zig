@@ -1,4 +1,5 @@
 const std: type = @import("std");
+
 const c: type = @import("c_time_header");
 
 pub const clocks_per_sec: i32 = @intCast(c.CLOCKS_PER_SEC);

@@ -13,6 +13,6 @@ pub fn main() void {
         .sec = 0,
     };
 
-    const s: []u8 = c_time.ascTimeTS(&buffer, date_time) orelse return;
+    const s: []u8 = c_time.ascTimeSafe(&buffer, date_time) orelse return;
     std.debug.print("{s}", .{s});
 }

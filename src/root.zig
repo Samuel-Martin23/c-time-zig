@@ -27,7 +27,7 @@ pub fn ascTime(date_time: DateTime) ?[]u8 {
     return std.mem.span(s);
 }
 
-pub fn ascTimeTS(buf: []u8, date_time: DateTime) ?[]u8 {
+pub fn ascTimeSafe(buf: []u8, date_time: DateTime) ?[]u8 {
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
@@ -46,8 +46,8 @@ pub fn cTime(t: i64) ?[]u8 {
     return std.mem.span(s);
 }
 
-pub fn cTimeTS(buf: []u8, t: i64) ?[]u8 {
-    const date_time: DateTime = localTimeTS(t) orelse return null;
+pub fn cTimeSafe(buf: []u8, t: i64) ?[]u8 {
+    const date_time: DateTime = localTimeSafe(t) orelse return null;
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
@@ -66,7 +66,7 @@ pub fn gmTime(t: i64) ?DateTime {
     return dateTimeFromTm(@ptrCast(tm));
 }
 
-pub fn gmTimeTS(t: i64) ?DateTime {
+pub fn gmTimeSafe(t: i64) ?DateTime {
     var tm: cdef.struct_tm = cdef.struct_tm{};
 
     if (@hasDecl(cdef, "_gmtime64_s")) {
@@ -99,7 +99,7 @@ pub fn localTime(t: i64) ?DateTime {
     return dateTimeFromTm(@ptrCast(tm));
 }
 
-pub fn localTimeTS(t: i64) ?DateTime {
+pub fn localTimeSafe(t: i64) ?DateTime {
     var tm: cdef.struct_tm = cdef.struct_tm{};
 
     if (@hasDecl(cdef, "_localtime64_s")) {

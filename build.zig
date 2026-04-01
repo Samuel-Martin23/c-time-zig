@@ -39,8 +39,8 @@ pub fn build(b: *std.Build) void {
             .desc = "Converts a broken-down time into a fixed-format, human-readable string",
         },
         .{
-            .name = "ascTimeTS",
-            .path = "examples/ascTimeTS.zig",
+            .name = "ascTimeSafe",
+            .path = "examples/ascTimeSafe.zig",
             .desc = "Thread-safe conversion of a broken-down time into a human-readable string",
         },
         .{
@@ -54,8 +54,8 @@ pub fn build(b: *std.Build) void {
             .desc = "Converts calendar time to a readable local date and time string",
         },
         .{
-            .name = "cTimeTS",
-            .path = "examples/cTimeTS.zig",
+            .name = "cTimeSafe",
+            .path = "examples/cTimeSafe.zig",
             .desc = "Thread-safe conversion of calendar time to a readable date and time string",
         },
         .{
@@ -69,8 +69,8 @@ pub fn build(b: *std.Build) void {
             .desc = "Converts calendar time to a UTC broken-down time structure",
         },
         .{
-            .name = "gmTimeTS",
-            .path = "examples/gmTimeTS.zig",
+            .name = "gmTimeSafe",
+            .path = "examples/gmTimeSafe.zig",
             .desc = "Thread-safe conversion of calendar time to a UTC broken-down time structure",
         },
         .{
@@ -79,8 +79,8 @@ pub fn build(b: *std.Build) void {
             .desc = "Converts calendar time to a local broken-down time structure",
         },
         .{
-            .name = "localTimeTS",
-            .path = "examples/localTimeTS.zig",
+            .name = "localTimeSafe",
+            .path = "examples/localTimeSafe.zig",
             .desc = "Thread-safe conversion of calendar time to a local broken-down time structure",
         },
         .{

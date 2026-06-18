@@ -16,7 +16,7 @@ pub const DateTime: type = struct {
     isdst: i32 = 0,
 };
 
-pub fn ascTime(date_time: DateTime) ?[]u8 {
+pub fn ascTime(date_time: DateTime) ?[:0]u8 {
     const tm: cdef.struct_tm = tmFromDateTime(&date_time);
     const s: [*c]u8 = cdef.asctime(&tm);
 
@@ -27,7 +27,7 @@ pub fn ascTime(date_time: DateTime) ?[]u8 {
     return std.mem.span(s);
 }
 
-pub fn ascTimeSafe(buf: []u8, date_time: DateTime) ?[]u8 {
+pub fn ascTimeSafe(buf: []u8, date_time: DateTime) ?[:0]u8 {
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
@@ -35,7 +35,7 @@ pub fn clock() i32 {
     return @intCast(cdef.clock());
 }
 
-pub fn cTime(t: i64) ?[]u8 {
+pub fn cTime(t: i64) ?[:0]u8 {
     const casted_t: cdef.time_t = @intCast(t);
     const s: [*c]u8 = cdef.ctime(&casted_t);
 
@@ -46,7 +46,7 @@ pub fn cTime(t: i64) ?[]u8 {
     return std.mem.span(s);
 }
 
-pub fn cTimeSafe(buf: []u8, t: i64) ?[]u8 {
+pub fn cTimeSafe(buf: []u8, t: i64) ?[:0]u8 {
     const date_time: DateTime = localTimeSafe(t) orelse return null;
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
@@ -130,7 +130,7 @@ pub fn mkTime(date_time: *DateTime) i64 {
     return return_value;
 }
 
-pub fn strFmtTime(buf: []u8, format: []const u8, date_time: DateTime) ?[]u8 {
+pub fn strFmtTime(buf: []u8, format: [:0]const u8, date_time: DateTime) ?[:0]u8 {
     const tm: cdef.struct_tm = tmFromDateTime(&date_time);
     const bytes_written: usize = cdef.strftime(buf.ptr, buf.len, format.ptr, &tm);
 
@@ -138,7 +138,7 @@ pub fn strFmtTime(buf: []u8, format: []const u8, date_time: DateTime) ?[]u8 {
         return null;
     }
 
-    return buf[0..bytes_written];
+    return buf[0..bytes_written :0];
 }
 
 pub fn time() i64 {

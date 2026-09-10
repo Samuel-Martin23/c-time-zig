@@ -16,18 +16,7 @@ pub const DateTime: type = struct {
     isdst: i32 = 0,
 };
 
-pub fn ascTime(date_time: DateTime) ?[:0]u8 {
-    const tm: cdef.struct_tm = tmFromDateTime(&date_time);
-    const s: [*c]u8 = cdef.asctime(&tm);
-
-    if (s == null) {
-        return null;
-    }
-
-    return std.mem.span(s);
-}
-
-pub fn ascTimeSafe(buf: []u8, date_time: DateTime) ?[:0]u8 {
+pub fn ascTime(buf: []u8, date_time: DateTime) ?[:0]u8 {
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
@@ -35,19 +24,8 @@ pub fn clock() i32 {
     return @intCast(cdef.clock());
 }
 
-pub fn cTime(t: i64) ?[:0]u8 {
-    const casted_t: cdef.time_t = @intCast(t);
-    const s: [*c]u8 = cdef.ctime(&casted_t);
-
-    if (s == null) {
-        return null;
-    }
-
-    return std.mem.span(s);
-}
-
-pub fn cTimeSafe(buf: []u8, t: i64) ?[:0]u8 {
-    const date_time: DateTime = localTimeSafe(t) orelse return null;
+pub fn cTime(buf: []u8, t: i64) ?[:0]u8 {
+    const date_time: DateTime = localTime(t) orelse return null;
     return strFmtTime(buf, "%a %b %e %H:%M:%S %Y\n", date_time);
 }
 
@@ -56,17 +34,6 @@ pub fn diffTime(t1: i64, t2: i64) f64 {
 }
 
 pub fn gmTime(t: i64) ?DateTime {
-    const casted_t: cdef.time_t = @intCast(t);
-    const tm: [*c]cdef.struct_tm = cdef.gmtime(&casted_t);
-
-    if (tm == null) {
-        return null;
-    }
-
-    return dateTimeFromTm(@ptrCast(tm));
-}
-
-pub fn gmTimeSafe(t: i64) ?DateTime {
     var tm: cdef.struct_tm = cdef.struct_tm{};
 
     if (@hasDecl(cdef, "_gmtime64_s")) {
@@ -89,17 +56,6 @@ pub fn gmTimeSafe(t: i64) ?DateTime {
 }
 
 pub fn localTime(t: i64) ?DateTime {
-    const casted_t: cdef.time_t = @intCast(t);
-    const tm: [*c]cdef.struct_tm = cdef.localtime(&casted_t);
-
-    if (tm == null) {
-        return null;
-    }
-
-    return dateTimeFromTm(@ptrCast(tm));
-}
-
-pub fn localTimeSafe(t: i64) ?DateTime {
     var tm: cdef.struct_tm = cdef.struct_tm{};
 
     if (@hasDecl(cdef, "_localtime64_s")) {

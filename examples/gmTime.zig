@@ -6,5 +6,5 @@ pub fn main() void {
     const time: i64 = c_time.time();
     const date_time: c_time.DateTime = c_time.gmTime(time) orelse return;
 
-    std.debug.print("{d}\n", .{date_time.hour});
+    std.debug.print("{d}", .{date_time.hour});
 }

@@ -1,5 +1,3 @@
-const std: type = @import("std");
-
 const cdef: type = @import("c_time_header");
 
 pub const clocks_per_sec: i32 = @intCast(cdef.CLOCKS_PER_SEC);
